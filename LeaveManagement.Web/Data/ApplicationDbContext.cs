@@ -14,6 +14,7 @@ namespace LeaveManagement.Web.Data
         }
 
         // Note the pluralization of property names - Trevoir recommends, "jury still out" on whether this is a best practice
+        //  Tables will be created named according to these properties
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
     }
