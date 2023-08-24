@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<LeaveManagement.Web.Models.LeaveTypeViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Leave Types";
 }
 
-<h1>Index</h1>
+<h1>Types of Leave</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-success" asp-action="Create"><i class="fa fa-plus"></i> Create New</a>
 </p>
 <table class="table">
     <thead>
@@ -31,11 +31,44 @@
                 @Html.DisplayFor(modelItem => item.DefaultDays)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id"><i class="fa fa-pencil"></i></a>
+                <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id"><i class="fa fa-info-circle"></i></a>
+                <button data-id="@item.Id" class="btn btn-danger deleteBtn" type="button"><i class="far fa-trash-alt"></i></button>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<form id="deleteFrom" asp-action="Delete">
+    <input type="hidden" id="LeaveTypeId" name="Id"/>
+ </form>
+
+
+@section Scripts
+    {
+    <script>
+        $(function () {
+            // DataTables functionality
+            new DataTable('.table'); // Change from #example to class of table to which to apply DataTables
+
+            // Event handler for delete button clicked
+            $('.deleteBtn').click(function (e) {
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you want to permanently delete this record?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#LeaveTypeId').val(id);
+                        $('#deleteFrom').submit();
+                    }
+                });
+            });
+        });
+    </script>
+}
