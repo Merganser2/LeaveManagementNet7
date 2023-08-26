@@ -80,6 +80,25 @@ namespace LeaveManagement.Web.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+            ///
+            ///  Adding three fields from Employee to the Input Model, along with Display Names, and other Html tag helpers
+            /// 
+            [Required]
+            [Display(Name = "First Name")]
+            public string Firstname { get; set; }
+
+            [Required]
+            [Display(Name = "Last Name")]
+            public string Lastname { get; set; }
+
+            [DataType(DataType.Date)]
+            [Display(Name = "Date of Birth")]
+            public DateTime? DateOfBirth { get; set; }
+
+            [DataType(DataType.Date)]
+            [Display(Name = "Date Joined")]
+            public DateTime? DateJoined { get; set; } = DateTime.Today;
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -112,10 +131,14 @@ namespace LeaveManagement.Web.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                var user = CreateUser(); // Employee type
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.Firstname = Input.Firstname;
+                user.Lastname = Input.Lastname;
+                user.DateJoined = Input.DateJoined ?? default;
+                user.DateOfBirth = Input.DateOfBirth ?? default;
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
