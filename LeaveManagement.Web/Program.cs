@@ -28,6 +28,7 @@ builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25
 // Inject the repository pattern we created: Contract and Implementation (from Contracts and Repositories)
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(ILeaveTypeRepository), typeof(LeaveTypeRepository));
+builder.Services.AddScoped(typeof(ILeaveAllocationRepository), typeof(LeaveAllocationRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

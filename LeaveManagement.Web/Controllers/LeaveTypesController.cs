@@ -20,13 +20,16 @@ namespace LeaveManagement.Web.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ILeaveTypeRepository _leaveTypeRepository;
+        private readonly ILeaveAllocationRepository _leaveAllocationRepository;
 
         // Dependency injenction of database context (each controller interacting with db needs this),
         //  and Automapper
-        public LeaveTypesController(ApplicationDbContext context, IMapper mapper, ILeaveTypeRepository leaveTypeRepository)
+        public LeaveTypesController(ApplicationDbContext context, IMapper mapper, 
+                                    ILeaveTypeRepository leaveTypeRepository, ILeaveAllocationRepository leaveAllocationRepository)
         {
             this._mapper = mapper;
             this._leaveTypeRepository = leaveTypeRepository;
+            this._leaveAllocationRepository = leaveAllocationRepository;
         }
 
         // GET: LeaveTypes
@@ -148,5 +151,18 @@ namespace LeaveManagement.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        // Adding an action for LeaveAllocation within this controller, rather than creating a new one only for this
+        //  This is just a Post action, no associated view. Note Action name must match that of the associated button
+        // POST: LeaveTypes
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AllocateLeave(int id)
+        {
+            await _leaveAllocationRepository.LeaveAllocation(id);
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
