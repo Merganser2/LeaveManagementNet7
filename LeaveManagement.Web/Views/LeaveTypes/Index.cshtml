@@ -40,7 +40,7 @@
     </tbody>
 </table>
 
-<form id="deleteFrom" asp-action="Delete">
+<form id="deleteForm" asp-action="Delete">
     <input type="hidden" id="LeaveTypeId" name="Id"/>
  </form>
 
@@ -65,7 +65,7 @@
                         var btn = $(this);
                         var id = btn.data("id");
                         $('#LeaveTypeId').val(id);
-                        $('#deleteFrom').submit();
+                        $('#deleteForm').submit();
                     }
                 });
             });

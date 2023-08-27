@@ -15,5 +15,8 @@ namespace LeaveManagement.Web.Data
         [ForeignKey("EmployeeTypeId")]
         public Employee Employee { get; set; }
         public string EmployeeId { get; set; }
+
+        // Time period (year or whatever) in which allocation occurs
+        public int Period { get; set; }
     }
 }
