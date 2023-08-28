@@ -1,6 +1,8 @@
-﻿using LeaveManagement.Web.Constants;
+﻿using AutoMapper;
+using LeaveManagement.Web.Constants;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
+using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +13,15 @@ namespace LeaveManagement.Web.Repositories
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Employee> _userManager;
         private readonly ILeaveTypeRepository _leaveTypeRepository;
+        private readonly IMapper _mapper;
 
-        public LeaveAllocationRepository(ApplicationDbContext context, UserManager<Employee> userManager, ILeaveTypeRepository leaveTypeRepository) : base(context)
+        public LeaveAllocationRepository(ApplicationDbContext context, UserManager<Employee> userManager, 
+                                         ILeaveTypeRepository leaveTypeRepository, IMapper mapper) : base(context)
         {
             this._context = context;
             this._userManager = userManager;
             this._leaveTypeRepository = leaveTypeRepository;
+            this._mapper = mapper;
         }
 
         public async Task LeaveAllocation(int leaveTypeId)
@@ -49,6 +54,18 @@ namespace LeaveManagement.Web.Repositories
             return await _context.LeaveAllocations.AnyAsync(l => l.EmployeeId == employeeId 
                                                                  && l.LeaveTypeId  == leaveTypeId
                                                                  && l.Period == Period);
+        }
+
+        public async Task<EmployeeAllocationViewModel> GetEmployeeAllocations(string employeeId)
+        {
+            var allocations = await _context.LeaveAllocations
+                                  .Include(q => q.LeaveType) // Get additional info we need from LeaveType table, like DefaultDays (like an inner join)
+                                  .Where(q => q.EmployeeId == employeeId).ToListAsync();
+            var employee = await _userManager.FindByIdAsync(employeeId);
+            var employeeAllocationModel = _mapper.Map<EmployeeAllocationViewModel>(employee);
+            employeeAllocationModel.LeaveAllocations = _mapper.Map<List<LeaveAllocationViewModel>>(allocations);
+
+            return employeeAllocationModel;
         }
     }
 }

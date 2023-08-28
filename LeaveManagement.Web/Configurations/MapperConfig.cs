@@ -9,7 +9,13 @@ namespace LeaveManagement.Web.Configurations
         // Tell Automapper it is ok to convert Type A to Type B
         public MapperConfig()
         {
-         CreateMap<LeaveType, LeaveTypeViewModel>().ReverseMap();       
+           CreateMap<LeaveType, LeaveTypeViewModel>().ReverseMap();
+           CreateMap<Employee, EmployeeListViewModel>().ReverseMap();
+           CreateMap<Employee, EmployeeAllocationViewModel>().ReverseMap();
+           CreateMap<LeaveAllocation, LeaveAllocationViewModel>().ReverseMap();
+           // Later CreateMap<LeaveAllocation, LeaveAllocationEditViewModel>().ReverseMap();
+
         }
     }
 }
+
