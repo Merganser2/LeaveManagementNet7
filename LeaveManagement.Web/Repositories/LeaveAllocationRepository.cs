@@ -4,6 +4,7 @@ using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Web.Repositories
@@ -24,6 +25,7 @@ namespace LeaveManagement.Web.Repositories
             this._mapper = mapper;
         }
 
+        // Allocate Leave for all Employees
         public async Task LeaveAllocation(int leaveTypeId)
         {
             var employees = await _userManager.GetUsersInRoleAsync(Roles.User);
@@ -56,6 +58,7 @@ namespace LeaveManagement.Web.Repositories
                                                                  && l.Period == Period);
         }
 
+        // Get all Leave Allocations for this employee's ID
         public async Task<EmployeeAllocationViewModel> GetEmployeeAllocations(string employeeId)
         {
             var allocations = await _context.LeaveAllocations
@@ -66,6 +69,36 @@ namespace LeaveManagement.Web.Repositories
             employeeAllocationModel.LeaveAllocations = _mapper.Map<List<LeaveAllocationViewModel>>(allocations);
 
             return employeeAllocationModel;
+        }
+
+        // Get this Allocation with all the details. Trevoir named this GetEmployeeAllocation
+        public async Task<LeaveAllocationEditViewModel> GetAllocationDetails(int id)
+        {
+            var allocation = await _context.LeaveAllocations
+                                  .Include(q => q.LeaveType) // Get additional info we need from LeaveType table, like DefaultDays (like an inner join)
+                                  .FirstOrDefaultAsync(q => q.Id == id);
+            if (allocation == null) return null;
+
+            var allocationEditModel = _mapper.Map<LeaveAllocationEditViewModel>(allocation);
+
+            var employee = await _userManager.FindByIdAsync(allocation.EmployeeId);
+
+            allocationEditModel.Employee = _mapper.Map<EmployeeAllocationViewModel>(employee);
+
+            return allocationEditModel;
+        }
+
+        public async Task<bool> UpdateEmployeeAllocation(LeaveAllocationEditViewModel model)
+        {
+            var leaveAllocation = await GetAsync(model.Id);
+
+            if (leaveAllocation == null) return false;
+
+            leaveAllocation.Period = model.Period;
+            leaveAllocation.NumberOfDays = model.NumberOfDays;
+            await UpdateAsync(leaveAllocation);
+
+            return true;
         }
     }
 }

@@ -1,60 +1,86 @@
 ﻿@model LeaveManagement.Web.Models.EmployeeAllocationViewModel
 
 @{
-    ViewData["Title"] = "ViewAllocations";
+    ViewData["Title"] = "View Allocations";
 }
 
 <h1>View Allocations for @Model.Firstname @Model.Lastname</h1>
 
 <div>
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Firstname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Firstname)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Lastname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lastname)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DateJoined)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateJoined)
-        </dd>
+        <div class="col align-self-start">
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Firstname)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Firstname)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+        </div>
+
+        <div class="col align-self-center">
+            <dt class = "col-sm-4">
+                @Html.DisplayNameFor(model => model.Lastname)
+            </dt>
+            <dd class = "col-sm-8">
+                @Html.DisplayFor(model => model.Lastname)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.DateJoined)
+            </dt>
+            <dd class="col-sm-8">
+                @Html.DisplayFor(model => model.DateJoined)
+            </dd>
+        </div>
+        <div class="col align-self-right"></div>
     </dl>
 </div>
 
-<div class="card" style="width: 18rem;">
+<div class="card">
   <div class="card-header">
         <h4>Leave Allocations</h4>
-    </div>
+  </div>
   <ul class="list-group list-group-flush">
         <li class="list-group-item">
             <div class="row">
-                <div class="col">Leave Description</div>
+                <div class="col"> </div>
                 <div class="col">Original Allocation</div>
                 <div class="col">Current Allocation</div>
                 <div class="col">Period</div>
+                <div class="col">Action</div>
             </div>
         </li>
         @foreach (var allocation in Model.LeaveAllocations)
         {
-            <li class="list-group-item"> @allocation.LeaveType.Name </li>
-            <li class="list-group-item"> @allocation.LeaveType.DefaultDays </li>
-            <li class="list-group-item"> @allocation.NumberOfDays </li>
-            <li class="list-group-item"> @allocation.Period </li>
+          <li class="list-group-item">
+            <div class="row">
+                <div class="col"><h6>@allocation.LeaveType.Name</h6></div>
+                <div class="col">
+                    <button type="button" class="btn btn-info">
+                            Allocated Days <span class="badge bg-secondary">@allocation.LeaveType.DefaultDays</span>
+                    </button>                     
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-primary">
+                            Remaining Days <span class="badge bg-secondary">@allocation.NumberOfDays</span>
+                    </button>                     
+                </div>
+                <div class="col"> @allocation.Period </div>
+                <div class="col">
+                  <a class="btn btn-warning" asp-action="EditAllocation" asp-route-id="@allocation.Id"><i class="fas fa-pencil-alt"></i>Edit Allocation</a>
+                </div>
+            </div>
+          </li>
         } 
   </ul>
+</div>
+<br />
+<div>
+    <a asp-action="Index">Back to Employees' Allocations List</a>
 </div>
 

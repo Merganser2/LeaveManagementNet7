@@ -15,12 +15,15 @@ namespace LeaveManagement.Web.Controllers
         private readonly UserManager<Employee> _userManager;
         private readonly IMapper _mapper;
         private readonly ILeaveAllocationRepository _leaveAllocationRepository;
+        private readonly ILeaveTypeRepository _leaveTypeRepository;
 
-        public EmployeesController(UserManager<Employee> userManager, IMapper mapper, ILeaveAllocationRepository leaveAllocationRepository)
+        public EmployeesController(UserManager<Employee> userManager, IMapper mapper, 
+                                    ILeaveAllocationRepository leaveAllocationRepository, ILeaveTypeRepository leaveTypeRepository)
         {
             this._userManager = userManager;
             this._mapper = mapper;
             this._leaveAllocationRepository = leaveAllocationRepository;
+            this._leaveTypeRepository = leaveTypeRepository;
         }
 
         // GET: EmployeesController
@@ -39,46 +42,47 @@ namespace LeaveManagement.Web.Controllers
             return View(model);
         }
 
-        // GET: EmployeesController/Create
-        public ActionResult Create()
+        // GET: EmployeesController/EditAllocation/5
+        public async Task<IActionResult> EditAllocation(int id)
         {
-            return View();
+            var model = await _leaveAllocationRepository.GetAllocationDetails(id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
         }
 
-        // POST: EmployeesController/Create
+        // POST: EmployeesController/EditAllocation/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        // NOTE: At 7:48 in 48. he changes 2nd param from IFormCollection collection to...
+        //      How does this work, ie how does that object come in? Same pattern in LeaveTypesController, but didn't notice it at the time. Revisit....
+        //      Does it get shared via the GET version?
+        public async Task<IActionResult> EditAllocation(int id, LeaveAllocationEditViewModel model)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    if (await _leaveAllocationRepository.UpdateEmployeeAllocation(model))
+                    { 
+                        return RedirectToAction(nameof(ViewAllocations), new { id = model.EmployeeId});
+                    }
+                }
             }
             catch
             {
-                return View();
+                ModelState.AddModelError(String.Empty, "An error has occurred.");
             }
-        }
 
-        // GET: EmployeesController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            // Trying to fully grok this: we have to get this information for the View in case the Edit fails
+            model.Employee = _mapper.Map<EmployeeListViewModel>(await _userManager.FindByIdAsync(model.EmployeeId));
+            model.LeaveType = _mapper.Map<LeaveTypeViewModel>(await _leaveTypeRepository.GetAsync(model.LeaveTypeId));
 
-        // POST: EmployeesController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return View(); // Will display any Model State errors that arose
         }
 
         // GET: EmployeesController/Delete/5
