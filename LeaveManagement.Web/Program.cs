@@ -3,7 +3,9 @@ using LeaveManagement.Web.Configurations;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Repositories;
+using LeaveManagement.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,9 +21,14 @@ builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireC
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
+// Default SMTP port 25 
+builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25, "no-reply@leavemanagement.com"));
+
 // Inject the repository pattern we created: Contract and Implementation (from Contracts and Repositories)
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(ILeaveTypeRepository), typeof(LeaveTypeRepository));
+builder.Services.AddScoped(typeof(ILeaveAllocationRepository), typeof(LeaveAllocationRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 
