@@ -6,6 +6,7 @@ namespace LeaveManagement.Web.Models
 {
     public class LeaveRequestViewModel : LeaveRequestCreateViewModel
     {
+        public int Id { get; set; }
 
         [Display(Name = "Leave Type")]
         public LeaveTypeViewModel LeaveType { get; set; } // Reminder: don't use Data types within a model; use other models
@@ -19,9 +20,6 @@ namespace LeaveManagement.Web.Models
         public string? RequestingEmployeeId { get; set; }
         public EmployeeListViewModel Employee { get; set; }
     }
-    /* 
-        public int Id { get; set; }
 
-        public int NumberOfDays { get; set; }
-    */
+//        public int NumberOfDays { get; set; }
 }

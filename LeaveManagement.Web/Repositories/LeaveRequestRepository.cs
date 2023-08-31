@@ -4,6 +4,7 @@ using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Web.Repositories
 {
@@ -26,6 +27,11 @@ namespace LeaveManagement.Web.Repositories
             this._httpContextAccessor = httpContextAccessor;
             this._leaveAllocationRepository = leaveAllocationRepository;
             this._userManager = userManager;
+        }
+
+        public async Task<List<LeaveRequest>> GetAllAsync(string employeeId)
+        {
+            return await _context.LeaveRequests.Where(q => q.RequestingEmployeeId == employeeId).ToListAsync();
         }
 
         public async Task<bool> CreateLeaveRequest(LeaveRequestCreateViewModel model)
@@ -53,6 +59,19 @@ namespace LeaveManagement.Web.Repositories
             await AddAsync(leaveRequest);
 
             return true;
+        }
+
+        public async Task<EmployeeLeaveRequestViewModel> GetMyLeaveDetails()
+        {
+            var user = await _userManager.GetUserAsync(_httpContextAccessor?.HttpContext?.User);
+
+            // NOTE: The object returned from async call is accessible outside the parens
+            var allocations = (await _leaveAllocationRepository.GetEmployeeAllocations(user.Id)).LeaveAllocations; 
+            // TODO: consider creating smaller method in LeaveAllocationRepository to get only LeaveAllocations
+
+            var requests = _mapper.Map<List<LeaveRequestViewModel>>(await GetAllAsync(user.Id));
+
+            return new EmployeeLeaveRequestViewModel(allocations, requests);
         }
     }
 }

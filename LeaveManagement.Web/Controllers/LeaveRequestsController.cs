@@ -11,6 +11,7 @@ using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using LeaveManagement.Web.Contracts;
+using LeaveManagement.Web.Constants;
 
 namespace LeaveManagement.Web.Controllers
 {
@@ -31,6 +32,20 @@ namespace LeaveManagement.Web.Controllers
         {
             var applicationDbContext = _context.LeaveRequests.Include(l => l.LeaveType);
             return View(await applicationDbContext.ToListAsync());
+        }
+
+        [Authorize(Roles = Roles.Administrator)]
+        // GET: LeaveRequests
+        public async Task<IActionResult> Index2()
+        {
+            var model = "nothing yet"; // await _requestRepository.GetAdminLeaveRequestList();
+            return View(model);
+        }
+
+        public async Task<ActionResult> MyLeave()
+        {
+            var model = await _requestRepository.GetMyLeaveDetails();
+            return View(model);
         }
 
         // GET: LeaveRequests/Details/5
@@ -75,7 +90,7 @@ namespace LeaveManagement.Web.Controllers
                 if (ModelState.IsValid)
                 {
                     await _requestRepository.CreateLeaveRequest(model);
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(MyLeave));
                 }
             }
             catch
