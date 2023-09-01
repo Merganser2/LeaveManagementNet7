@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LeaveManagement.Web.Data;
-using LeaveManagement.Web.Repositories;
 using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Authorization;
-using AutoMapper;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Constants;
 
@@ -76,8 +70,13 @@ namespace LeaveManagement.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await _leaveRequestRepository.CreateLeaveRequest(model);
-                    return RedirectToAction(nameof(MyLeave));
+                    var isValid = await _leaveRequestRepository.CreateLeaveRequest(model);
+
+                    if (isValid)
+                    {
+                        return RedirectToAction(nameof(MyLeave));
+                    }
+                    ModelState.AddModelError(String.Empty, "You have exceeded your allocation for this Leave Type.");
                 }
             }
             catch
@@ -86,6 +85,7 @@ namespace LeaveManagement.Web.Controllers
             }
 
             model.LeaveTypes = new SelectList(_context.LeaveTypes, "Id", "Name", model.LeaveTypeId);
+
             return View(model);
         }
 

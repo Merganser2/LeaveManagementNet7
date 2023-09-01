@@ -54,10 +54,10 @@
                 @Html.DisplayNameFor(model => model.LeaveRequests[0].LeaveType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LeaveRequests[0].DateRequested)
+                @Html.DisplayNameFor(model => model.LeaveRequests[0].NumberOfDaysRequested)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LeaveRequests[0].NumberOfDaysRequested)
+                @Html.DisplayNameFor(model => model.LeaveRequests[0].DateRequested)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LeaveRequests[0].Approved)
@@ -79,10 +79,10 @@
                     @Html.DisplayFor(modelItem => leaveRequest.LeaveType.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => leaveRequest.DateRequested)
+                    <text>&nbsp;</text>@Html.DisplayFor(modelItem => leaveRequest.NumberOfDaysRequested)
                 </td>
                 <td>
-                    <text>&nbsp;</text>@Html.DisplayFor(modelItem => leaveRequest.NumberOfDaysRequested)
+                    @Html.DisplayFor(modelItem => leaveRequest.DateRequested)
                 </td>
                 <td>
                     @if (leaveRequest.Cancelled)

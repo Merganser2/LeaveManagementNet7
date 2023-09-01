@@ -131,9 +131,14 @@ namespace LeaveManagement.Web.Repositories
 
             // NOTE: The object returned from async call is accessible outside the parens
             var allocations = (await _leaveAllocationRepository.GetEmployeeAllocations(user.Id)).LeaveAllocations; 
-            // TODO: consider creating smaller method in LeaveAllocationRepository to get only LeaveAllocations
 
             var requests = _mapper.Map<List<LeaveRequestViewModel>>(await GetAllAsync(user.Id));
+
+            // To display number of days requested
+            foreach (var request in requests)
+            {
+                request.NumberOfDaysRequested = (int)(request.EndDate.Value - request.StartDate.Value).TotalDays;
+            }
 
             return new EmployeeLeaveRequestViewModel(allocations, requests);
         }

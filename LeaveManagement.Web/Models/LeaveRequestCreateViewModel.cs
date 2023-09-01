@@ -30,6 +30,11 @@ namespace LeaveManagement.Web.Models
                 yield return new ValidationResult("Start Date must be before End Date", new [] { nameof(StartDate), nameof(EndDate) });
             }
 
+            if (StartDate < DateTime.Today)
+            {
+                yield return new ValidationResult("Start Date must not be in the past", new[] { nameof(StartDate) });
+            }
+
             if (RequestComments?.Length > 250)
             {
                 yield return new ValidationResult("Comments are too long", new[] { nameof(RequestComments) });
