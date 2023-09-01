@@ -19,7 +19,8 @@ namespace LeaveManagement.Web.Models
 
         public string? RequestingEmployeeId { get; set; }
         public EmployeeListViewModel Employee { get; set; }
-    }
 
-//        public int NumberOfDays { get; set; }
+        [Display(Name = "Days")]
+        public int NumberOfDaysRequested { get; set; }
+    }
 }

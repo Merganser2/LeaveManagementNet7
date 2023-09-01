@@ -57,6 +57,9 @@
                 @Html.DisplayNameFor(model => model.LeaveRequests[0].DateRequested)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.LeaveRequests[0].NumberOfDaysRequested)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.LeaveRequests[0].Approved)
             </th>
             <th></th>
@@ -79,6 +82,9 @@
                     @Html.DisplayFor(modelItem => leaveRequest.DateRequested)
                 </td>
                 <td>
+                    <text>&nbsp;</text>@Html.DisplayFor(modelItem => leaveRequest.NumberOfDaysRequested)
+                </td>
+                <td>
                     @if (leaveRequest.Cancelled)
                     {
                         <span class="badge bg-secondary">Cancelled</span>
@@ -97,7 +103,22 @@
                     }
                 </td>
                 <td>
-                    <a class="btn btn-danger btn-sm" asp-action="CancelLeaveRequest" asp-route-id="@leaveRequest.Id">Cancel Request</a>
+                    @if (leaveRequest.Approved == null)
+                    {
+                        @if(leaveRequest.Cancelled == false)
+                        {
+                            <form asp-action="Cancel" asp-route-id="@leaveRequest.Id">
+                                <input type="submit" value="Cancel Request" class="btn btn-danger btn-sm"/>
+                            </form>
+                        }
+                         else
+                        {
+                            <form asp-action="Uncancel" asp-route-id="@leaveRequest.Id">
+                                <input type="submit" value="Re-activate Request" class="btn btn-danger btn-sm" />
+                            </form>
+                        }
+
+                    }
                 </td>
             </tr>
         }

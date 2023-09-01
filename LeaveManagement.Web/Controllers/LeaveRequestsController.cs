@@ -27,18 +27,11 @@ namespace LeaveManagement.Web.Controllers
             _requestRepository = requestRepository;
         }
 
+        [Authorize(Roles = Roles.Administrator)]
         // GET: LeaveRequests
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.LeaveRequests.Include(l => l.LeaveType);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        [Authorize(Roles = Roles.Administrator)]
-        // GET: LeaveRequests
-        public async Task<IActionResult> Index2()
-        {
-            var model = "nothing yet"; // await _requestRepository.GetAdminLeaveRequestList();
+            var model = await _requestRepository.GetAdminLeaveRequestList(); 
             return View(model);
         }
 
@@ -100,6 +93,36 @@ namespace LeaveManagement.Web.Controllers
 
             model.LeaveTypes = new SelectList(_context.LeaveTypes, "Id", "Name", model.LeaveTypeId);
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            try
+            {
+                await _requestRepository.CancelLeaveRequest(id,true);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return RedirectToAction(nameof(MyLeave));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Uncancel(int id)
+        {
+            try
+            {
+                await _requestRepository.CancelLeaveRequest(id,false);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return RedirectToAction(nameof(MyLeave));
         }
 
         // GET: LeaveRequests/Edit/5
