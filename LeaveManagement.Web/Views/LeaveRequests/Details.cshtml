@@ -1,15 +1,49 @@
-﻿@model LeaveManagement.Web.Data.LeaveRequest
+﻿@model LeaveManagement.Web.Models.LeaveRequestViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Leave Request Details";
+    string className;
+    string headingText;
+    if(Model.Approved == null)
+    {
+        headingText = "Pending Approval";
+        className = "warning";
+    }
+    else if(Model.Approved == true)
+    {
+        headingText = "Approved";
+        className = "success";
+    }
+    else
+    {
+        headingText = "Rejected";
+        className = "danger";
+    }
 }
 
-<h1>Details</h1>
+<h1>Leave Request Details</h1>
+
+<div class="alert alert-@className" role="alert">
+    <h4 class="alert-heading">@headingText</h4>
+    <hr>
+    <p>
+        <strong>Employee Name:</strong>  @Model.Employee.Firstname @Model.Employee.Lastname
+    </p>
+    <hr/>
+    <p>
+        <strong>Date Requested:</strong> @Html.DisplayFor(model => model.DateRequested)
+    </p>
+</div>
 
 <div>
-    <h4>LeaveRequest</h4>
     <hr />
     <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LeaveType)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LeaveType.Name)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.StartDate)
         </dt>
@@ -23,56 +57,36 @@
             @Html.DisplayFor(model => model.EndDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LeaveType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LeaveType.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateRequested)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateRequested)
-        </dd>
-        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.RequestComments)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.RequestComments)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Approved)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Approved)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cancelled)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cancelled)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RequestingEmployeeId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RequestingEmployeeId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateCreated)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateCreated)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateModified)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateModified)
-        </dd>
     </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+    @if(Model.Approved == null)
+    {
+        <div class="col">
+            <form asp-action="ApproveRequest" class="form-inline">
+                <input name="Id" value="@Model.Id" type="hidden" />
+                <input name="approved" type="hidden" value="true"/>
+                <button type="submit" class="btn btn-success btn-lg">Approve</button>
+            </form>
+        </div>
+        <div class="col">
+            <form asp-action="ApproveRequest" class="form-inline">
+                <input name="Id" value="@Model.Id" type="hidden" />
+                <input name="approved" type="hidden" value="false"/>
+                <button type="submit" class="btn btn-danger btn-lg">Reject</button>
+            </form>
+        </div>
+    }
+
+        <div class="col">
+            <a class="btn btn-dark btn-lg" asp-action="Index">Back to List</a>
+        </div>
+    </div>
 </div>
