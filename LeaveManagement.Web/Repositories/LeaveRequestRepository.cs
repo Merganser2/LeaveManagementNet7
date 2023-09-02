@@ -5,6 +5,7 @@ using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace LeaveManagement.Web.Repositories
 {
@@ -12,18 +13,21 @@ namespace LeaveManagement.Web.Repositories
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly AutoMapper.IConfigurationProvider _configurationProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILeaveAllocationRepository _leaveAllocationRepository;
         private readonly UserManager<Employee> _userManager;
 
         public LeaveRequestRepository(ApplicationDbContext context,
-            IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+        IMapper mapper,
+        AutoMapper.IConfigurationProvider configurationProvider,
+        IHttpContextAccessor httpContextAccessor,
             ILeaveAllocationRepository leaveAllocationRepository,
             UserManager<Employee> userManager) : base(context)
         {
             this._context = context;
             this._mapper = mapper;
+            this._configurationProvider = configurationProvider;
             this._httpContextAccessor = httpContextAccessor;
             this._leaveAllocationRepository = leaveAllocationRepository;
             this._userManager = userManager;

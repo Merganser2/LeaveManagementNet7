@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using LeaveManagement.Web.Constants;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
@@ -6,6 +7,7 @@ using LeaveManagement.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace LeaveManagement.Web.Repositories
 {
@@ -15,14 +17,17 @@ namespace LeaveManagement.Web.Repositories
         private readonly UserManager<Employee> _userManager;
         private readonly ILeaveTypeRepository _leaveTypeRepository;
         private readonly IMapper _mapper;
+        private readonly AutoMapper.IConfigurationProvider _configurationProvider;
 
         public LeaveAllocationRepository(ApplicationDbContext context, UserManager<Employee> userManager, 
-                                         ILeaveTypeRepository leaveTypeRepository, IMapper mapper) : base(context)
+                                         ILeaveTypeRepository leaveTypeRepository, 
+                                         IMapper mapper, AutoMapper.IConfigurationProvider configurationProvider) : base(context)
         {
             this._context = context;
             this._userManager = userManager;
             this._leaveTypeRepository = leaveTypeRepository;
             this._mapper = mapper;
+            this._configurationProvider = configurationProvider;
         }
 
         // Allocate Leave for all Employees
@@ -63,10 +68,14 @@ namespace LeaveManagement.Web.Repositories
         {
             var allocations = await _context.LeaveAllocations
                                   .Include(q => q.LeaveType) // Get additional info we need from LeaveType table, like DefaultDays (like an inner join)
-                                  .Where(q => q.EmployeeId == employeeId).ToListAsync();
+                                  .Where(q => q.EmployeeId == employeeId)
+                                  .ProjectTo<LeaveAllocationViewModel>(_configurationProvider)
+                                  .ToListAsync();
             var employee = await _userManager.FindByIdAsync(employeeId);
             var employeeAllocationModel = _mapper.Map<EmployeeAllocationViewModel>(employee);
-            employeeAllocationModel.LeaveAllocations = _mapper.Map<List<LeaveAllocationViewModel>>(allocations);
+
+            // By using ProjectTo we avoid having to do: _mapper.Map<List<LeaveAllocationViewModel>>(allocations);
+            employeeAllocationModel.LeaveAllocations = allocations; 
 
             return employeeAllocationModel;
         }
