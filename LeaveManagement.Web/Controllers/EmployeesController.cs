@@ -78,32 +78,22 @@ namespace LeaveManagement.Web.Controllers
                 ModelState.AddModelError(String.Empty, "An error has occurred.");
             }
 
-            // Trying to fully grok this: we have to get this information for the View in case the Edit fails
+            // We have to get this information for the View in case the Edit fails
             model.Employee = _mapper.Map<EmployeeListViewModel>(await _userManager.FindByIdAsync(model.EmployeeId));
             model.LeaveType = _mapper.Map<LeaveTypeViewModel>(await _leaveTypeRepository.GetAsync(model.LeaveTypeId));
 
             return View(); // Will display any Model State errors that arose
         }
 
-        // GET: EmployeesController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: EmployeesController/Delete/5
-        [HttpPost]
+        // POST: LeaveTypes/Delete/5
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var employee = await _userManager.FindByIdAsync(id);
+            await _userManager.DeleteAsync(employee);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

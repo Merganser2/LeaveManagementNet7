@@ -40,9 +40,39 @@
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
-                <a asp-action="ViewAllocations" asp-route-id="@item.Id" class="btn btn-primary">View Allocations</a>
+                <a asp-action="ViewAllocations" asp-route-id="@item.Id" class="btn btn-primary">View Allocations</a>&nbsp;&nbsp;&nbsp;
+                <button data-id="@item.Id" class="btn btn-danger deleteBtn" type="button"><i class="far fa-trash-alt"></i>  Remove Employee</button>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<form id="deleteForm" asp-action="Delete">
+    <input type="hidden" id="EmployeeId" name="Id" />
+</form>
+
+@section Scripts
+    {
+    <script>
+        $(function () {
+            // Event handler for delete button clicked
+            $('.deleteBtn').click(function (e) {
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you want to permanently remove this Employee from the System?",
+                    icon: "warning",
+                    buttons: ["No, Cancel", "Yes - I understand the consequences of doing so."],
+                    dangerMode: true
+                }).then((confirm) => {
+                    if (confirm) {
+                        var btn = $(this);
+                        var id = btn.data("id");
+                        $('#EmployeeId').val(id);
+                        $('#deleteForm').submit();
+                    }
+                });
+            });
+        });
+    </script>
+}
