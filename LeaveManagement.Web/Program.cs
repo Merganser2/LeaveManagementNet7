@@ -20,6 +20,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddHttpContextAccessor();
 
 
 // Default SMTP port 25 
@@ -29,6 +30,7 @@ builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped(typeof(ILeaveTypeRepository), typeof(LeaveTypeRepository));
 builder.Services.AddScoped(typeof(ILeaveAllocationRepository), typeof(LeaveAllocationRepository));
+builder.Services.AddScoped(typeof(ILeaveRequestRepository), typeof(LeaveRequestRepository));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 

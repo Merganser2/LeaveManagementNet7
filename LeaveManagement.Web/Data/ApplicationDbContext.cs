@@ -27,5 +27,6 @@ namespace LeaveManagement.Web.Data
         //  Tables will be created named according to these properties
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }  
     }
 }

@@ -9,7 +9,7 @@ namespace LeaveManagement.Web.Models
         public int Id { get; set; }
 
         [Required]
-        [Display(Name = "Number of Days")]
+        [Display(Name = "Number of Days Allocated")]
         [Range(1, 365, ErrorMessage = "Invalid Number of Days")]
         public int NumberOfDays { get; set; }
 
