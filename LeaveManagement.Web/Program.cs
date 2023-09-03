@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,9 @@ builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireC
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddHttpContextAccessor();
 
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
 
 // Default SMTP port 25 
 builder.Services.AddTransient<IEmailSender>(s => new EmailSender("localhost", 25, "no-reply@leavemanagement.com"));
@@ -37,6 +41,8 @@ builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
