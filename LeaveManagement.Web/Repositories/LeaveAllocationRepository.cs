@@ -84,13 +84,13 @@ namespace LeaveManagement.Web.Repositories
             var allocations = await _context.LeaveAllocations
                                   .Include(q => q.LeaveType) // Get additional info we need from LeaveType table, like DefaultDays (like an inner join)
                                   .Where(q => q.EmployeeId == employeeId)
-                                  .ProjectTo<LeaveAllocationViewModel>(_configurationProvider)
+                           //       .ProjectTo<LeaveAllocationViewModel>(_configurationProvider)
                                   .ToListAsync();
             var employee = await _userManager.FindByIdAsync(employeeId);
             var employeeAllocationModel = _mapper.Map<EmployeeAllocationViewModel>(employee);
 
-            // By using ProjectTo we avoid having to do: _mapper.Map<List<LeaveAllocationViewModel>>(allocations);
-            employeeAllocationModel.LeaveAllocations = allocations; 
+            // By using ProjectTo we avoid having to do: _mapper.Map<List<LeaveAllocationViewModel>>(allocations); BUT this caused a problem...
+            employeeAllocationModel.LeaveAllocations = _mapper.Map<List<LeaveAllocationViewModel>>(allocations); // allocations; 
 
             return employeeAllocationModel;
         }
