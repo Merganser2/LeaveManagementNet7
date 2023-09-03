@@ -109,15 +109,15 @@
                         {
                             <form asp-action="Cancel" asp-route-id="@leaveRequest.Id">
                                 <input name="Id" value="@leaveRequest.Id" type="hidden" />
-                                <input name="cancel " type="hidden" value="true" />
+                                <input name="cancel" type="hidden" value="true" />
                                 <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button>
                             </form>
                         }
                          else
                         {
-                            <form asp-action="Uncancel" class="form-inline" asp-route-id="@leaveRequest.Id">
+                            <form asp-action="Cancel" class="form-inline" asp-route-id="@leaveRequest.Id">
                                 <input name="Id" value="@leaveRequest.Id" type="hidden" />
-                                <input name="cancel "type="hidden"  value="false" />
+                                <input name="cancel" type="hidden"  value="false" />
                                 <button type="submit" class="btn btn-warning btn-sm">Re-activate Request</button>
                             </form>
                         }
