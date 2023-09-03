@@ -2,10 +2,10 @@
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
-using Microsoft.AspNetCore.Http;
+using LeaveManagement.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace LeaveManagement.Web.Repositories
 {
@@ -17,13 +17,15 @@ namespace LeaveManagement.Web.Repositories
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILeaveAllocationRepository _leaveAllocationRepository;
         private readonly UserManager<Employee> _userManager;
+        private readonly IEmailSender _emailSender;
 
         public LeaveRequestRepository(ApplicationDbContext context,
-        IMapper mapper,
-        AutoMapper.IConfigurationProvider configurationProvider,
-        IHttpContextAccessor httpContextAccessor,
+            IMapper mapper, 
+            AutoMapper.IConfigurationProvider configurationProvider,
+            IHttpContextAccessor httpContextAccessor,
             ILeaveAllocationRepository leaveAllocationRepository,
-            UserManager<Employee> userManager) : base(context)
+            UserManager<Employee> userManager,
+            IEmailSender emailSender) : base(context)
         {
             this._context = context;
             this._mapper = mapper;
@@ -31,6 +33,7 @@ namespace LeaveManagement.Web.Repositories
             this._httpContextAccessor = httpContextAccessor;
             this._leaveAllocationRepository = leaveAllocationRepository;
             this._userManager = userManager;
+            this._emailSender = emailSender;
         }
 
         public async Task<List<LeaveRequest>> GetAllAsync(string employeeId)
@@ -78,6 +81,12 @@ namespace LeaveManagement.Web.Repositories
 
             await AddAsync(leaveRequest);
 
+            // Notify Employee via Email
+            /* Disabling until Email server is working again and this can be tested */
+            await _emailSender.SendEmailAsync(user.Email, "Leave Request Submitted Successfully", 
+                $"Your leave request from " + $"{leaveRequest.StartDate} to {leaveRequest.EndDate} has been submitted for approval");
+            // */
+
             return true;
         }
 
@@ -107,6 +116,17 @@ namespace LeaveManagement.Web.Repositories
             }
 
             await UpdateAsync(leaveRequest);
+
+            // Notify Employee via email of change in Leave Request Approval Status
+            var approvalStatus = approved ? "Approved" : "Declined";
+
+            string htmlMessage = $"Your leave request from " +
+                $"{leaveRequest.StartDate} to {leaveRequest.EndDate} has been {approvalStatus}";
+
+            var user = await _userManager.FindByIdAsync(leaveRequest.RequestingEmployeeId);
+
+            /* Disabling until Email server is working again and this can be tested
+            await _emailSender.SendEmailAsync(user?.Email, $"Leave Request {approvalStatus}", htmlMessage); */
         }
 
         public async Task<AdminLeaveRequestViewModel> GetAdminLeaveRequestList()

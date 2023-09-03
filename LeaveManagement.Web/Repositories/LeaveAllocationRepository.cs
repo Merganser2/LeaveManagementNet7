@@ -4,7 +4,9 @@ using LeaveManagement.Web.Constants;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
+using LeaveManagement.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,16 +20,20 @@ namespace LeaveManagement.Web.Repositories
         private readonly ILeaveTypeRepository _leaveTypeRepository;
         private readonly IMapper _mapper;
         private readonly AutoMapper.IConfigurationProvider _configurationProvider;
+        private readonly IEmailSender _emailSender;
 
         public LeaveAllocationRepository(ApplicationDbContext context, UserManager<Employee> userManager, 
                                          ILeaveTypeRepository leaveTypeRepository, 
-                                         IMapper mapper, AutoMapper.IConfigurationProvider configurationProvider) : base(context)
+                                         IMapper mapper, AutoMapper.IConfigurationProvider configurationProvider,
+                                         IEmailSender emailSender
+                                         ) : base(context)
         {
             this._context = context;
             this._userManager = userManager;
             this._leaveTypeRepository = leaveTypeRepository;
             this._mapper = mapper;
             this._configurationProvider = configurationProvider;
+            this._emailSender = emailSender;
         }
 
         // Allocate Leave for all Employees
@@ -38,6 +44,7 @@ namespace LeaveManagement.Web.Repositories
             var leaveType = await _leaveTypeRepository.GetAsync(leaveTypeId);
 
             var leaveAllocations = new List<LeaveAllocation>();
+            var employeesWithNewAllocations = new List<Employee>();
 
             foreach (var employee in employees)
             {
@@ -50,10 +57,18 @@ namespace LeaveManagement.Web.Repositories
                         NumberOfDays = leaveType.DefaultDays,
                         Period = period
                     });
+                    employeesWithNewAllocations.Add(employee);
                 }
             }
 
             await AddRangeAsync(leaveAllocations);
+
+            /* Disabling until Email Server is working again for this to be tested
+            foreach (var employee in employeesWithNewAllocations)
+            {
+                await _emailSender.SendEmailAsync(employee.Email, $"Leave Allocation Posted for {period}", $"Your {leaveType.Name} " +
+                    $"has been posted for the period of {period}. You have been given {leaveType.DefaultDays}.");
+            }*/
         }
 
         public async Task<bool> AllocationExists(string employeeId, int leaveTypeId, int Period)
