@@ -11,6 +11,7 @@ using LeaveManagement.Web.Models;
 using LeaveManagement.Web.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using LeaveManagement.Web.Constants;
+using LeaveManagement.Web.Repositories;
 
 namespace LeaveManagement.Web.Controllers
 {
@@ -104,12 +105,22 @@ namespace LeaveManagement.Web.Controllers
                 return NotFound();
             }
 
+            // Get data record first, rather than just taking LeaveTypeViewModel, in order
+            //   to preserve auditing fields (DateCreated,DateModified)
+            var leaveType = await _leaveTypeRepository.GetAsync(id);
+
+            if (leaveType == null)
+            {
+                return NotFound();
+            }
+
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var leaveType = _mapper.Map<LeaveType>(leaveTypeVM);
-
+                    // Map LeaveTypeViewModel instance to LeaveType record
+                    _mapper.Map(leaveTypeVM, leaveType);
                     await _leaveTypeRepository.UpdateAsync(leaveType);
                 }
                 catch (DbUpdateConcurrencyException)
