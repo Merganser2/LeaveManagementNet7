@@ -12,11 +12,14 @@ namespace LeaveManagement.Web.Controllers
     {
         private readonly ILeaveRequestRepository _leaveRequestRepository;
         private readonly ILeaveTypeRepository _leaveTypeRepository;
+        private readonly ILogger<LeaveRequestsController> _logger;
 
-        public LeaveRequestsController(ILeaveRequestRepository requestRepository, ILeaveTypeRepository leaveTypeRepository)
+        public LeaveRequestsController(ILeaveRequestRepository requestRepository, ILeaveTypeRepository leaveTypeRepository, 
+                                       ILogger<LeaveRequestsController> logger)
         {
             _leaveRequestRepository = requestRepository;
             _leaveTypeRepository = leaveTypeRepository;
+            _logger = logger;
         }
 
         [Authorize(Roles = Roles.Administrator)]
@@ -78,8 +81,10 @@ namespace LeaveManagement.Web.Controllers
                     ModelState.AddModelError(String.Empty, "You have exceeded your allocation for this Leave Type.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error Creating Leave Request");
+
                 ModelState.AddModelError(String.Empty, "An error has occurred.");
             }
 
@@ -98,6 +103,7 @@ namespace LeaveManagement.Web.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error Cancelling Leave Request");
                 throw;
             }
             return RedirectToAction(nameof(MyLeave));
@@ -113,7 +119,7 @@ namespace LeaveManagement.Web.Controllers
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Error Approving or Rejecting Leave Request");
                 throw;
             }
             return RedirectToAction(nameof(Index));
