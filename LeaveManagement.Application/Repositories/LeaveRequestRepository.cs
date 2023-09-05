@@ -111,7 +111,12 @@ namespace LeaveManagement.Application.Repositories
             {
                 var allocation = await _leaveAllocationRepository.GetEmployeeAllocation(leaveRequest.RequestingEmployeeId, leaveRequestId);
                 int daysRequested = (int)(leaveRequest.EndDate - leaveRequest.StartDate).TotalDays;
+
                 allocation.NumberOfDays -= daysRequested;
+
+                // Prevent Number of days allocated from being negative to cover an edge case: if a request is created,
+                //  and allocation is reduced before the request is approved
+                if (allocation.NumberOfDays < 0) allocation.NumberOfDays = 0; 
 
                 await _leaveAllocationRepository.UpdateAsync(allocation);
             }
