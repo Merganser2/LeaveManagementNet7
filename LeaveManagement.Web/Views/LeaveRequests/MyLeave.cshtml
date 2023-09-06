@@ -107,19 +107,17 @@
                     {
                         @if(leaveRequest.Cancelled == false)
                         {
-                            <form asp-action="Cancel" asp-route-id="@leaveRequest.Id">
+@*                             <form asp-action="Cancel" asp-route-id="@leaveRequest.Id">
                                 <input name="Id" value="@leaveRequest.Id" type="hidden" />
                                 <input name="cancel" type="hidden" value="true" />
-                                <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button> 
                             </form>
+ *@
+                            <button data-id="@leaveRequest.Id" class="btn btn-danger btn-sm cancelBtn" type="button">Cancel</button>
                         }
                          else
                         {
-                            <form asp-action="Cancel" class="form-inline" asp-route-id="@leaveRequest.Id">
-                                <input name="Id" value="@leaveRequest.Id" type="hidden" />
-                                <input name="cancel" type="hidden"  value="false" />
-                                <button type="submit" class="btn btn-warning btn-sm">Re-activate Request</button>
-                            </form>
+                            <button data-id="@leaveRequest.Id" class="btn btn-warning btn-sm reactivateBtn" type="button">Re-activate</button>
                         }
                     }
                 </td>
@@ -127,3 +125,58 @@
         }
     </tbody>
 </table>
+
+<form id="cancelForm" asp-action="Cancel">
+    <input type="hidden" id="LeaveRequestId_1" name="Id" />
+    <input type="hidden" name="cancel" value="true" />
+</form>
+
+<form id="reactivateForm" asp-action="Cancel">
+    <input type="hidden" id="LeaveRequestId_2" name="Id" />
+    <input type="hidden" name="cancel" value="false" />
+</form>
+
+
+@section Scripts
+{
+<script>
+    $(function () {
+
+        // Event handler for re-activate button clicked
+        $('.reactivateBtn').click(function (e) {
+                    swal({
+                        title: "Are you sure?",
+                        text: "Are you sure you want to re-activate this leave request?",
+                        icon: "warning",
+                        buttons: ["No", "Yes"],
+                        dangerMode: false
+                    }).then((confirm) => {
+                        if (confirm) {
+                            var btn = $(this);
+                            var id = btn.data("id");
+                            $('#LeaveRequestId_2').val(id);
+                            $('#reactivateForm').submit();
+                        }
+                    });
+        });
+
+        // Event handler for cancel button clicked
+        $('.cancelBtn').click(function (e) {
+            swal({
+                title: "Are you sure?",
+                text: "Are you sure you want to cancel this leave request?",
+                icon: "warning",
+                buttons: ["No", "Yes"],
+                dangerMode: false
+            }).then((confirm) => {
+                if (confirm) {
+                    var btn = $(this);
+                    var id = btn.data("id");
+                    $('#LeaveRequestId_1').val(id);
+                    $('#cancelForm').submit();
+                }
+            });
+        });
+    });
+</script>
+}
